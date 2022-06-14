@@ -32,6 +32,7 @@ w = capture.get(cv2.CAP_PROP_FRAME_WIDTH)
 h = capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
 vid_writer = cv2.VideoWriter("ChokePoint/final_system_with_rec.mp4", cv2.VideoWriter_fourcc(*"mp4v"), 20.0, (int(w), int(h)) )
 start_time = time.time()
+angle = True
 m_cur = 0
 
 for k in range(K):
@@ -47,8 +48,9 @@ for k in range(K):
             det_res.append([faces[i][0], faces[i][1], faces[i][2], faces[i][3], prob[i]])
 
         online_targets = tracker.update(np.array(det_res), (height, width), (height, width))
+        # angle can be calculated if needed, use function in angle.py
         for t in online_targets:
-            if m_cur < t.track_id or d[t.track_id] == 'Imposter':
+            if (m_cur < t.track_id or d[t.track_id] == 'Imposter') and angle:
                 tlwh = t.tlwh
                 img_cropped = cv2.resize(img[int(tlwh[1]):int(tlwh[1] + tlwh[3]), int(tlwh[0]):int(tlwh[0] + tlwh[2])],
                                          (160, 160))
